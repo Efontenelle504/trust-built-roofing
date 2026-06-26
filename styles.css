@@ -2058,38 +2058,26 @@ textarea {
     width: 100%;
   }
 
+  /* Mobile: collapse the rail to a slim header row so the form + buttons fit. */
   .trust-modal__rail {
-    gap: 10px;
-    padding: 18px 58px 16px 18px;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    padding: 12px 56px 12px 18px;
   }
 
-  .trust-modal__rail h2 {
-    font-size: 24px;
-    max-width: 260px;
-  }
-
-  .trust-modal__rail p {
-    font-size: 13px;
-    line-height: 1.4;
-    max-width: 360px;
-  }
-
-  .trust-modal__trust-list {
-    gap: 6px;
-    grid-template-columns: 1fr;
-  }
-
-  .trust-modal__trust-list li {
-    font-size: 12px;
-  }
-
+  .trust-modal__rail h2,
+  .trust-modal__rail p,
+  .trust-modal__trust-list,
   .trust-modal__step-list {
     display: none;
   }
 
   .trust-modal__phone {
-    align-self: start;
+    align-self: auto;
     font-size: 13px;
+    margin-left: auto;
     min-height: 36px;
     padding: 0 12px;
   }
@@ -2155,10 +2143,14 @@ textarea {
 
   .trust-modal__footer {
     align-items: stretch;
+    background: var(--paper);
+    border-top: 1px solid var(--border);
+    bottom: 0;
     flex-direction: column;
     gap: 12px;
     margin: 0 -16px;
     padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+    position: sticky;
   }
 
   .trust-modal__footer p {
