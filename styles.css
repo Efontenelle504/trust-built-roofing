@@ -66,6 +66,8 @@ html {
 
 body {
   background: var(--paper-platinum);
+  color: var(--ink);
+  font-family: var(--font-body);
   margin: 0;
   overflow-x: clip;
 }
@@ -1337,6 +1339,22 @@ textarea {
 }
 
 .trust-modal__choice[data-selected="true"] .trust-modal__choice-mark::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Selection shown via :checked so the modal does not need to re-render on every change. */
+.trust-modal__choice:has(input:checked) {
+  background: #fbf3e2;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgb(176 138 78 / 18%);
+}
+
+.trust-modal__choice:has(input:checked) .trust-modal__choice-mark {
+  border-color: var(--gold);
+}
+
+.trust-modal__choice:has(input:checked) .trust-modal__choice-mark::after {
   opacity: 1;
   transform: scale(1);
 }

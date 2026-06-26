@@ -110,24 +110,6 @@
     return field ? fieldSteps[field] : -1;
   }
 
-  function setField(name, value) {
-    formData[name] = value;
-    delete errors[name];
-    status = "";
-    renderModal();
-  }
-
-  function toggleRoofNeed(value) {
-    if (formData.roofNeeds.includes(value)) {
-      formData.roofNeeds = formData.roofNeeds.filter((item) => item !== value);
-    } else {
-      formData.roofNeeds = formData.roofNeeds.concat(value);
-    }
-    delete errors.roofNeeds;
-    status = "";
-    renderModal();
-  }
-
   function errorText(field) {
     return errors[field] ? '<p class="trust-modal__field-error" id="trust-lead-' + field + '-error" role="alert">' + escapeHtml(errors[field]) + "</p>" : "";
   }
@@ -505,31 +487,35 @@
     }
   });
 
+  // Store field values WITHOUT re-rendering the modal. Re-rendering on every
+  // change rebuilds the DOM mid-interaction, which freezes native <select>
+  // pickers on iOS (the "breaks after step 2" bug). Selection styling is shown
+  // via CSS :checked, so no re-render is needed here.
   root.addEventListener("change", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement)) return;
     if (target.name === "roofNeeds") {
-      toggleRoofNeed(target.value);
+      if (formData.roofNeeds.includes(target.value)) {
+        formData.roofNeeds = formData.roofNeeds.filter((item) => item !== target.value);
+      } else {
+        formData.roofNeeds = formData.roofNeeds.concat(target.value);
+      }
+      delete errors.roofNeeds;
+      status = "";
       return;
     }
     if (target.name === "consent") {
-      setField("consent", target.checked);
+      formData.consent = target.checked;
+      delete errors.consent;
+      status = "";
       return;
     }
     if (target instanceof HTMLInputElement && target.type === "file") return;
-    if (target instanceof HTMLInputElement && target.type !== "checkbox" && target.type !== "radio") {
+    if (target.name) {
       formData[target.name] = target.value;
       delete errors[target.name];
       status = "";
-      return;
     }
-    if (target instanceof HTMLTextAreaElement) {
-      formData[target.name] = target.value;
-      delete errors[target.name];
-      status = "";
-      return;
-    }
-    if (target.name) setField(target.name, target.value);
   });
 
   root.addEventListener("input", (event) => {
