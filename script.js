@@ -27,6 +27,9 @@
   // Use a GoHighLevel Workflow Inbound Webhook URL. Do not put private
   // HighLevel API tokens in this static file; browser users can see them.
   const TRUST_GHL_WEBHOOK_URL = "";
+  // Fallback when no GHL webhook is set AND the site is deployed on Netlify:
+  // leads are captured by Netlify Forms (dashboard + email notification).
+  const TRUST_NETLIFY_FORM = "roof-estimate";
   // ====================================================================
 
   const root = document.getElementById("trust-modal-root");
@@ -247,6 +250,35 @@
     }
   }
 
+  function encodeForm(data) {
+    return Object.keys(data)
+      .map((key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key]))
+      .join("&");
+  }
+
+  async function submitToNetlify() {
+    const body = {
+      "form-name": TRUST_NETLIFY_FORM,
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      zipCode: formData.zipCode,
+      homeowner: formData.homeowner,
+      roofNeeds: formData.roofNeeds.join(", "),
+      roofType: formData.roofType,
+      timeline: formData.timeline,
+      notes: formData.notes,
+      consent: formData.consent ? "Yes" : "No",
+      "bot-field": formData.website || ""
+    };
+    const response = await fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: encodeForm(body)
+    });
+    return response.ok;
+  }
+
   async function submitLeadForm() {
     if (submitting) return;
     const currentErrors = validateStep(step);
@@ -279,8 +311,26 @@
       return;
     }
     if (!TRUST_GHL_WEBHOOK_URL) {
-      status = "This form is not connected to GoHighLevel yet. Add the Workflow Inbound Webhook URL in script.js to go live, or call us now and we will take your request directly.";
+      // Fallback path: Netlify Forms (works once deployed on Netlify).
+      submitting = true;
+      errors = {};
+      status = "";
       renderModal();
+      try {
+        const ok = await submitToNetlify();
+        submitting = false;
+        if (ok) {
+          success = true;
+          focusModalNext = true;
+        } else {
+          status = "We could not send your request just now. Please call us and we will take it directly. Your details are safe.";
+        }
+        renderModal();
+      } catch {
+        submitting = false;
+        status = "We could not send your request just now. Please call us and we will take it directly. Your details are safe.";
+        renderModal();
+      }
       return;
     }
     submitting = true;

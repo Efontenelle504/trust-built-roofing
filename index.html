@@ -325,6 +325,21 @@
       </footer>
     </div>
     <div id="trust-modal-root"></div>
+    <!-- Netlify Forms registration (build-time detection). The visible form is JS-rendered;
+         Netlify only sees static HTML, so this hidden twin registers the fields. -->
+    <form name="roof-estimate" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name">
+      <input type="tel" name="phone">
+      <input type="email" name="email">
+      <input type="text" name="zipCode">
+      <input type="text" name="homeowner">
+      <input type="text" name="roofNeeds">
+      <input type="text" name="roofType">
+      <input type="text" name="timeline">
+      <textarea name="notes"></textarea>
+      <input type="text" name="consent">
+      <input type="text" name="bot-field">
+    </form>
     <script src="script.js"></script>
   </body>
 </html>
